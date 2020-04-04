@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "620145060076",
+    "firebase_url": "https://contact-tracing-158ef.firebaseio.com",
+    "project_id": "contact-tracing-158ef",
+    "storage_bucket": "contact-tracing-158ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620145060076:android:069bd18ff2c3e19c591dc9",
+        "android_client_info": {
+          "package_name": "com.diganta.contacttracingprototype"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620145060076-eenal9k2ehevsuf8jo4i1vnrhvakrcim.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5NUHq00xK6bZWDIeVMKFSgzulEUqHk-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620145060076-eenal9k2ehevsuf8jo4i1vnrhvakrcim.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
