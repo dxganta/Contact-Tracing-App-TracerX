@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 import 'bottom_sheet_text.dart';
 
 class ContactCard extends StatelessWidget {
   ContactCard(
-      {this.imagePath, this.email, this.infection, this.contactUsername});
+      {this.imagePath,
+      this.email,
+      this.infection,
+      this.contactUsername,
+      this.contactTime,
+      this.contactLocation});
 
   final String imagePath;
   final String email;
   final String infection;
   final String contactUsername;
+  final DateTime contactTime;
+  final Location contactLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +48,12 @@ class ContactCard extends StatelessWidget {
                         question: 'Username', result: contactUsername),
                     SizedBox(height: 5.0),
                     BottomSheetText(
-                        question: 'Contact Time', result: '30/03/2020 3:30 pm'),
+                        question: 'Contact Time',
+                        result: contactTime.toString()),
                     SizedBox(height: 5.0),
                     BottomSheetText(
                         question: 'Contact Location',
-                        result: 'Silpukhuri, Guwahati'),
+                        result: contactLocation.toString()),
                     SizedBox(height: 5.0),
                     BottomSheetText(question: 'Times Contacted', result: '3'),
                   ],

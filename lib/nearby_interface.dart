@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 
 import 'components/contact_card.dart';
@@ -14,12 +15,37 @@ class NearbyInterface extends StatefulWidget {
 }
 
 class _NearbyInterfaceState extends State<NearbyInterface> {
+  Location location = Location();
   Firestore _firestore = Firestore.instance;
   final Strategy strategy = Strategy.P2P_STAR;
   FirebaseUser loggedInUser;
   String testText = '';
   final _auth = FirebaseAuth.instance;
   List<dynamic> contactTraces = [];
+  List<dynamic> contactTimes = [];
+  List<dynamic> contactLocations = [];
+
+  void deleteOldContacts(int threshold) async {
+    await getCurrentUser();
+    DateTime timeNow = DateTime.now(); //get today's time
+
+    _firestore
+        .collection('users')
+        .document(loggedInUser.email)
+        .collection('met_with')
+        .snapshots()
+        .listen((snapshot) {
+      for (var doc in snapshot.documents) {
+        DateTime contactTime =
+            doc.data['contact time']; // get last contact time
+        // if time since contact is greater than threshold than remove the contact
+        if (timeNow.difference(contactTime).inDays > threshold) {
+          doc.reference.delete();
+        }
+      }
+      setState(() {});
+    });
+  }
 
   void discovery() async {
     try {
@@ -30,9 +56,12 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         var docRef =
             _firestore.collection('users').document(loggedInUser.email);
 
-        //  When I discover someone I will see their email
+        //  When I discover someone I will see their email and add that email to the database of my contacts
+        //  also get the current time & location and add it to the database
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
+          'contact time': DateTime.now(),
+          'contact location': location.getLocation(),
         });
       }, onEndpointLost: (id) {
         print(id);
@@ -81,9 +110,13 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         .listen((snapshot) {
       for (var doc in snapshot.documents) {
         String currUsername = doc.data['username'];
+        String currTime = doc.data['contact time'];
+        String currLocation = doc.data['contact location'];
 
         if (!contactTraces.contains(currUsername)) {
           contactTraces.add(currUsername);
+          contactTimes.add(currTime);
+          contactLocations.add(currLocation);
         }
       }
       setState(() {});
@@ -94,6 +127,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   @override
   void initState() {
     super.initState();
+    deleteOldContacts(14);
     addContactsToList();
     getPermissions();
   }
@@ -212,6 +246,8 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
                     email: contactTraces[index],
                     infection: 'Not-Infected',
                     contactUsername: contactTraces[index],
+                    contactTime: contactTimes[index],
+                    contactLocation: contactLocations[index],
                   );
                 },
                 itemCount: contactTraces.length,
@@ -224,5 +260,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   }
 }
 
-// TODO: Integrate nearby_api and Nearby_interface.
 // TODO: Take mobile number instead of email
+
+// TODO: Delete contacts older than 14 days from database
