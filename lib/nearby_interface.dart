@@ -25,6 +25,35 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
   List<dynamic> contactTimes = [];
   List<dynamic> contactLocations = [];
 
+  void addContactsToList() async {
+    await getCurrentUser();
+
+    _firestore
+        .collection('users')
+        .document(loggedInUser.email)
+        .collection('met_with')
+        .snapshots()
+        .listen((snapshot) {
+      for (var doc in snapshot.documents) {
+        String currUsername = doc.data['username'];
+        DateTime currTime = doc.data.containsKey('contact time')
+            ? (doc.data['contact time'] as Timestamp).toDate()
+            : null;
+        String currLocation = doc.data.containsKey('contact location')
+            ? doc.data['contact location']
+            : null;
+
+        if (!contactTraces.contains(currUsername)) {
+          contactTraces.add(currUsername);
+          contactTimes.add(currTime);
+          contactLocations.add(currLocation);
+        }
+      }
+      setState(() {});
+      print(loggedInUser.email);
+    });
+  }
+
   void deleteOldContacts(int threshold) async {
     await getCurrentUser();
     DateTime timeNow = DateTime.now(); //get today's time
@@ -36,15 +65,19 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         .snapshots()
         .listen((snapshot) {
       for (var doc in snapshot.documents) {
-        DateTime contactTime =
-            doc.data['contact time']; // get last contact time
-        // if time since contact is greater than threshold than remove the contact
-        if (timeNow.difference(contactTime).inDays > threshold) {
-          doc.reference.delete();
+//        print(doc.data.containsKey('contact time'));
+        if (doc.data.containsKey('contact time')) {
+          DateTime contactTime = (doc.data['contact time'] as Timestamp)
+              .toDate(); // get last contact time
+          // if time since contact is greater than threshold than remove the contact
+          if (timeNow.difference(contactTime).inDays > threshold) {
+            doc.reference.delete();
+          }
         }
       }
-      setState(() {});
     });
+
+    setState(() {});
   }
 
   void discovery() async {
@@ -60,7 +93,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         //  also get the current time & location and add it to the database
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
-          'contact time': DateTime.now(),
+          'contact time': DateTime.now() as Timestamp,
           'contact location': location.getLocation(),
         });
       }, onEndpointLost: (id) {
@@ -98,30 +131,6 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
     } catch (e) {
       print(e);
     }
-  }
-
-  void addContactsToList() async {
-    await getCurrentUser();
-    _firestore
-        .collection('users')
-        .document(loggedInUser.email)
-        .collection('met_with')
-        .snapshots()
-        .listen((snapshot) {
-      for (var doc in snapshot.documents) {
-        String currUsername = doc.data['username'];
-        String currTime = doc.data['contact time'];
-        String currLocation = doc.data['contact location'];
-
-        if (!contactTraces.contains(currUsername)) {
-          contactTraces.add(currUsername);
-          contactTimes.add(currTime);
-          contactLocations.add(currLocation);
-        }
-      }
-      setState(() {});
-      print(loggedInUser.email);
-    });
   }
 
   @override
