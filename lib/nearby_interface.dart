@@ -93,7 +93,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         //  also get the current time & location and add it to the database
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
-          'contact time': DateTime.now() as Timestamp,
+          'contact time': DateTime.now(),
           'contact location': location.getLocation(),
         });
       }, onEndpointLost: (id) {
