@@ -94,7 +94,7 @@ class _NearbyInterfaceState extends State<NearbyInterface> {
         docRef.collection('met_with').document(name).setData({
           'username': await getUsernameOfEmail(email: name),
           'contact time': DateTime.now(),
-          'contact location': location.getLocation(),
+          'contact location': location.getLocation().toString(),
         });
       }, onEndpointLost: (id) {
         print(id);
