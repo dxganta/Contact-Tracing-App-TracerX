@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 
 import 'bottom_sheet_text.dart';
 
@@ -17,7 +16,7 @@ class ContactCard extends StatelessWidget {
   final String infection;
   final String contactUsername;
   final DateTime contactTime;
-  final Location contactLocation;
+  final String contactLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +51,7 @@ class ContactCard extends StatelessWidget {
                         result: contactTime.toString()),
                     SizedBox(height: 5.0),
                     BottomSheetText(
-                        question: 'Contact Location',
-                        result: contactLocation.toString()),
+                        question: 'Contact Location', result: contactLocation),
                     SizedBox(height: 5.0),
                     BottomSheetText(question: 'Times Contacted', result: '3'),
                   ],
